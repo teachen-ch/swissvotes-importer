@@ -8,7 +8,7 @@ swissvotes.ch contains a database with all present and historic votes (initiativ
 You can the tool by passing the connection arguments for you postgres database as needed
 
 ```bash
-python swissvotes-importer -u <DBUSER> -p <DBPASS> -h <DBHOST> -d <DBNAME>
+python importvotes.py -u <DBUSER> -p <DBPASS> -h <DBHOST> -d <DBNAME>
 ```
 
 which will generate:
