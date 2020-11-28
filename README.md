@@ -22,3 +22,6 @@ which will generate:
 ## Documentation
 The data format is documented in a (german) cookbook [here on swissvotes.ch](https://swissvotes.ch/page/dataset/codebook-de.pdf)
 
+## Copyright
+This script is provided under [AGPL-3.0](./LICENSE). The data is provided freely but the source swissvotes.ch needs to be mentioned, see [here](https://swissvotes.ch/page/dataset)
+
