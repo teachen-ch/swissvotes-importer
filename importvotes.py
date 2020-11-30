@@ -12,6 +12,7 @@ import getopt
 import sys
 
 DOWNLOAD_URL = "https://swissvotes.ch/page/dataset/swissvotes_dataset.csv"
+CATEGORIES_CSV = "./categories.csv"
 
 try:
     # Define the getopt parameters
@@ -21,7 +22,7 @@ try:
     values = dict(opts)
     user = values.get("-u", "")
     password = values.get("-p", "")
-    host = values.get("-p", "localhost")
+    host = values.get("-h", "localhost")
     database = values.get("-d", "swissvotes")
     table = values.get("-t", "swissvotes")
     userpass = user + (":%s" % password if password else "")
@@ -50,6 +51,9 @@ df = pd.read_csv(DOWNLOAD_URL, encoding='iso-8859-1', delimiter=';')
 
 df = df.dropna(how='all', axis=1)
 print("3) Parsed %d lines" % len(df))
+
+cats = pd.read_csv(CATEGORIES_CSV, delimiter='\t')
+
 
 # Save the data from dataframe to
 # postgres table "iris_dataset"
