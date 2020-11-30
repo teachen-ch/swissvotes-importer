@@ -10,6 +10,8 @@ from sqlalchemy import create_engine, exc
 import pandas as pd
 import getopt
 import sys
+import numpy
+from datetime import date
 
 DOWNLOAD_URL = "https://swissvotes.ch/page/dataset/swissvotes_dataset.csv"
 CATEGORIES_CSV = "./categories.csv"
@@ -47,17 +49,42 @@ except exc.OperationalError:
 
 print("2) Downloading and parsing latest swissvotes_dataset.csv")
 # Load in the data
-df = pd.read_csv(DOWNLOAD_URL, encoding='iso-8859-1', delimiter=';')
+votes = pd.read_csv(DOWNLOAD_URL, encoding='iso-8859-1',
+                    delimiter=';', parse_dates=['datum'])
 
-df = df.dropna(how='all', axis=1)
-print("3) Parsed %d lines" % len(df))
+votes = votes.dropna(how='all', axis=1)
+print("3) Parsed %d lines" % len(votes))
 
-cats = pd.read_csv(CATEGORIES_CSV, delimiter='\t')
 
+def getCat(dxex):
+    global categories
+    if dxex == '.':
+        return ''
+    if type(dxex) == numpy.float and dxex > 0:
+        dxex = str(int(dxex))
+    return categories.get(str(dxex), '')
+
+
+def replaceCats(vote):
+    global categories
+    cats = set()
+    for key in ['d1e1', 'd1e2', 'd1e3', 'd2e1', 'd2e2', 'd2e3', 'd3e1', 'd3e2', 'd3e3']:
+        cat = getCat(vote[key])
+        if (cat):
+            cats.add(cat)
+    vote.kategorien = '; '.join(cats)
+    return vote
+
+
+# read categories from csv and add them to votes
+cats = pd.read_csv(CATEGORIES_CSV, delimiter='\t', dtype={'code': str})
+categories = dict(zip(cats.code, cats.title))
+votes.insert(2, 'kategorien', '')
+votes = votes.apply(replaceCats, axis='columns')
 
 # Save the data from dataframe to
 # postgres table "iris_dataset"
-df.to_sql(
+votes.to_sql(
     table,
     engine,
     if_exists='replace',
